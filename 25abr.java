@@ -1,139 +1,316 @@
 package aed;
 
-import java.util.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class ListaEnlazada<T> implements Secuencia<T> {
-    private Nodo primero;
-    private Nodo ultimo;
-    private int longitud;
+import org.junit.jupiter.api.Test;
 
-    private class Nodo {
-        private T valor;
-        private Nodo siguiente;
-        private Nodo anterior;
+class ListaEnlazadaTests {
 
-        public Nodo(T valor){
-            this.valor = valor;
-            this.siguiente = null;
-            this.anterior = null;
-        }
+    @Test
+    void nuevaListaEstaVacia() {
+        ListaEnlazada<Integer> lista = new ListaEnlazada<>();
+
+        assertEquals(0, lista.longitud());
+    }
+
+    @Test
+    void agregarUnElementoAdelante() {
+        ListaEnlazada<Integer> lista = new ListaEnlazada<>();
+
+        lista.agregarAdelante(42);
+
+        assertEquals(1, lista.longitud());
+        assertEquals(42, lista.obtener(0));
+    }
+
+    @Test
+    void agregarUnElementoAtras() {
+        ListaEnlazada<Boolean> lista = new ListaEnlazada<>();
+
+        lista.agregarAtras(true);
+
+        assertEquals(1, lista.longitud());
+        assertEquals(true, lista.obtener(0));
+    }
+
+    @Test
+    void agregarVariosElementosSoloAdelante() {
+        ListaEnlazada<Float> lista = new ListaEnlazada<>();
+
+        lista.agregarAdelante(42.0f);
+        lista.agregarAdelante(41.0f);
+        lista.agregarAdelante(40.0f);
+        lista.agregarAdelante(39.0f);
+
+        assertEquals(4, lista.longitud());
+        assertEquals(39.0f, lista.obtener(0));
+        assertEquals(40.0f, lista.obtener(1));
+        assertEquals(41.0f, lista.obtener(2));
+        assertEquals(42.0f, lista.obtener(3));
+    }
+
+    @Test
+    void agregarVariosElementosSoloAtras() {
+        ListaEnlazada<Character> lista = new ListaEnlazada<>();
+
+        lista.agregarAtras('2');
+        lista.agregarAtras('3');
+        lista.agregarAtras('4');
+        lista.agregarAtras('5');
+
+        assertEquals(4, lista.longitud());
+        assertEquals('2', lista.obtener(0));
+        assertEquals('3', lista.obtener(1));
+        assertEquals('4', lista.obtener(2));
+        assertEquals('5', lista.obtener(3));
+    }
+
+    @Test
+    void agregarVariosElementosAdelanteYAtras() {
+        ListaEnlazada<Integer> lista = new ListaEnlazada<>();
+
+        lista.agregarAdelante(42);
+        lista.agregarAdelante(41);
+        lista.agregarAtras(43);
+        lista.agregarAdelante(40);
+        lista.agregarAtras(44);
+
+        assertEquals(5, lista.longitud());
+        assertEquals(40, lista.obtener(0));
+        assertEquals(41, lista.obtener(1));
+        assertEquals(42, lista.obtener(2));
+        assertEquals(43, lista.obtener(3));
+        assertEquals(44, lista.obtener(4));
+    }
+
+    @Test
+    void eliminarElementos() {
+        ListaEnlazada<Integer> lista = new ListaEnlazada<>();
+
+        lista.agregarAtras(42);
+        lista.agregarAtras(43);
+        lista.agregarAtras(44);
+        lista.agregarAtras(45);
+
+        lista.eliminar(1);
+
+        assertEquals(3, lista.longitud());
+        assertEquals(42, lista.obtener(0));
+        assertEquals(44, lista.obtener(1));
+        assertEquals(45, lista.obtener(2));
+
+        lista.eliminar(2);
+
+        assertEquals(2, lista.longitud());
+        assertEquals(42, lista.obtener(0));
+        assertEquals(44, lista.obtener(1));
+
+        lista.eliminar(0);
+        lista.eliminar(0);
+
+        assertEquals(0, lista.longitud());
+    }
+
+    @Test
+    void eliminarExtremos(){
+        ListaEnlazada<Integer> lista = new ListaEnlazada<>();
+
+        lista.agregarAdelante(43);
+        lista.agregarAtras(44);
+        lista.agregarAdelante(42);
+        lista.agregarAtras(45);
+
+        lista.eliminar(0);
+
+        assertEquals(3, lista.longitud());
+        assertEquals(43, lista.obtener(0));
+        assertEquals(44, lista.obtener(1));
+        assertEquals(45, lista.obtener(2));
+
+        lista.eliminar(2);
+
+        assertEquals(2, lista.longitud());
+        assertEquals(43, lista.obtener(0));
+        assertEquals(44, lista.obtener(1));
+
+        lista.eliminar(1);
+
+        assertEquals(1, lista.longitud());
+        assertEquals(43, lista.obtener(0));
+
+        lista.eliminar(0);
+        assertEquals(0, lista.longitud());
+    }
+
+    @Test
+    void modificarPosición() {
+        ListaEnlazada<Integer> lista = new ListaEnlazada<>();
+
+        lista.agregarAtras(42);
+        lista.agregarAtras(43);
+        lista.agregarAtras(44);
+        lista.agregarAtras(45);
+
+        lista.modificarPosicion(2, 27);
+
+        assertEquals(4, lista.longitud());
+        assertEquals(42, lista.obtener(0));
+        assertEquals(43, lista.obtener(1));
+        assertEquals(27, lista.obtener(2));
+        assertEquals(45, lista.obtener(3));
 
     }
 
-    public ListaEnlazada() {
-        this.primero = null;
-        this.ultimo = null;
-        this.longitud = 0;
+    @Test
+    void copiarListaConstructor() {
+        ListaEnlazada<Integer> lista = new ListaEnlazada<>();
+
+        lista.agregarAtras(42);
+        lista.agregarAtras(43);
+        lista.agregarAtras(44);
+        lista.agregarAtras(45);
+
+        ListaEnlazada<Integer> copiaDeLista = new ListaEnlazada<>(lista);
+
+        assertEquals(4, copiaDeLista.longitud());
+        assertEquals(42, copiaDeLista.obtener(0));
+        assertEquals(43, copiaDeLista.obtener(1));
+        assertEquals(44, copiaDeLista.obtener(2));
+        assertEquals(45, copiaDeLista.obtener(3));
+
+        // Test aliasing interno
+        lista.modificarPosicion(0, 99);
+        assertEquals(42, copiaDeLista.obtener(0));
+
+        // Test pisar memoria preexistente
+        lista.eliminar(0);
+        copiaDeLista = lista;
+        assertEquals(3, copiaDeLista.longitud());
+
+        copiaDeLista = new ListaEnlazada<>();
+        assertEquals(0, copiaDeLista.longitud());
+
     }
 
-    public int longitud() {
-        return this.longitud;
+    @Test
+    void listaDeElemComplejo() {
+        class Punto2D {
+            public Punto2D(int a, int b) {
+                x = a;
+                y = b;
+            }
+
+            public int x;
+            public int y;
+        }
+
+        ListaEnlazada<Punto2D> lista = new ListaEnlazada<>();
+        Punto2D p = new Punto2D(0, 1);
+        lista.agregarAdelante(p);
+        lista.agregarAtras(new Punto2D(4, 2));
+
+        assertEquals(2, lista.longitud());
+        assertEquals(0, lista.obtener(0).x);
+        assertEquals(1, lista.obtener(0).y);
+        assertEquals(4, lista.obtener(1).x);
+        assertEquals(2, lista.obtener(1).y);
+
     }
 
-    public void agregarAdelante(T elem) {
-        Nodo nuevoNodo = new Nodo(elem);
-        if (this.longitud == 0){
-            this.primero = nuevoNodo;
-            this.ultimo = nuevoNodo;
-        }
-        else {
-            nuevoNodo.siguiente = this.primero;
-            this.primero.anterior = nuevoNodo;
-            this.primero = nuevoNodo;
-        }
-        this.longitud++;
+    @Test
+    void imprimirLista(){
+        ListaEnlazada<Integer> lista = new ListaEnlazada<>();
+
+        lista.agregarAtras(42);
+        lista.agregarAtras(43);
+        lista.agregarAdelante(41);
+        lista.agregarAtras(44);
+        lista.agregarAtras(45);
+        lista.agregarAdelante(40);
+
+        assertEquals("[40, 41, 42, 43, 44, 45]", lista.toString());
     }
 
-    public void agregarAtras(T elem) {
-        Nodo nuevoNodo = new Nodo(elem);
-        if (this.longitud == 0){
-            this.primero = nuevoNodo;
-            this.ultimo = nuevoNodo;
-        }
-        else {
-            nuevoNodo.anterior = this.ultimo;
-            this.ultimo.siguiente = nuevoNodo;
-            this.ultimo = nuevoNodo;
-        }
-        this.longitud++;
+    @Test
+    void imprimirLuegoDeEliminar(){
+        ListaEnlazada<Integer> lista = new ListaEnlazada<>();
+
+        lista.agregarAtras(42);
+        lista.agregarAtras(43);
+        lista.agregarAdelante(41);
+        lista.agregarAtras(44);
+        lista.agregarAtras(45);
+        lista.agregarAdelante(40);
+
+        lista.eliminar(2);
+        lista.eliminar(3);
+        lista.eliminar(0);
+
+        assertEquals("[41, 43, 45]", lista.toString());
     }
 
-    public T obtener(int i) {
-        ListaIterador it = new ListaIterador();
-        if (i == 0) return this.primero.valor;
-        for (int index = 0; index < i-1; index++){
-            it.siguiente();
-        }
-        return it.siguiente();
+    @Test
+    void iteradorListaVacia() {
+        ListaEnlazada<Integer> lista = new ListaEnlazada<>();
+
+        Iterador<Integer> it = lista.iterador();
+
+        assertFalse(it.haySiguiente());
+        assertFalse(it.hayAnterior());
     }
 
-    public void eliminar(int i) {
-        Nodo matchingNodo = this.primero;
-        for (int index = 0; index < i; index++){
-            matchingNodo = matchingNodo.siguiente;
-        }
-        if (matchingNodo.anterior != null){
-            matchingNodo.siguiente.anterior = matchingNodo.anterior;  
-        }
-        else matchingNodo.siguiente.anterior = null; 
-        
-        if (matchingNodo.siguiente != null){
-            matchingNodo.anterior.siguiente = matchingNodo.siguiente;    
-        }
-        else matchingNodo.anterior.siguiente = null;
+    @Test
+    void iteradorRecorreListaHaciaAdelante() {
+        ListaEnlazada<Integer> lista = new ListaEnlazada<>();
 
-        this.longitud--;
+        lista.agregarAtras(42);
+        lista.agregarAtras(43);
+        lista.agregarAtras(44);
+
+        Iterador<Integer> it = lista.iterador();
+
+        assertTrue(it.haySiguiente());
+        assertEquals(42, it.siguiente());
+        assertTrue(it.haySiguiente());
+        assertEquals(43, it.siguiente());
+        assertTrue(it.haySiguiente());
+        assertEquals(44, it.siguiente());
+        assertFalse(it.haySiguiente());
     }
 
-    public void modificarPosicion(int indice, T elem) {
-        throw new UnsupportedOperationException("No implementada aun");
-    }
+    @Test
+    void iteradorEsBidireccional(){
+        ListaEnlazada<Integer> lista = new ListaEnlazada<>();
 
-    public ListaEnlazada(ListaEnlazada<T> lista) {
-        throw new UnsupportedOperationException("No implementada aun");
-    }
-    
-    @Override
-    public String toString() {
-        throw new UnsupportedOperationException("No implementada aun");
-    }
+        lista.agregarAtras(42);
+        lista.agregarAtras(43);
+        lista.agregarAtras(44);
 
-    private class ListaIterador implements Iterador<T> {
-        private Nodo nodo;
+        Iterador<Integer> it = lista.iterador();
 
-        public ListaIterador(){
-            this.nodo = new Nodo(primero.valor);
-            this.nodo.siguiente = primero.siguiente;
-        }
-
-        public boolean haySiguiente() {
-	        return !(this.nodo.siguiente != null);
-        }
-        
-        public boolean hayAnterior() {
-	        return !(this.nodo.anterior != null);
-        }
-
-        public T siguiente() {
-            T value = this.nodo.siguiente.valor;
-            Nodo siguiente = this.nodo.siguiente.siguiente;
-            Nodo anterior = this.nodo;
-            this.nodo = new Nodo(value);
-            this.nodo.siguiente = siguiente;
-            this.nodo.anterior = anterior;
-            return value;
-        }
-        
-
-        public T anterior() {
-            T value = this.nodo.anterior.valor;
-            this.nodo = this.nodo.anterior;
-            return value;
-        }
-    }
-
-    public Iterador<T> iterador() {
-	    throw new UnsupportedOperationException("No implementada aun");
+        assertTrue(it.haySiguiente());
+        assertFalse(it.hayAnterior());
+        assertEquals(42, it.siguiente());
+        assertTrue(it.haySiguiente());
+        assertEquals(43, it.siguiente());
+        assertTrue(it.hayAnterior());
+        assertEquals(43, it.anterior());
+        assertTrue(it.hayAnterior());
+        assertEquals(42, it.anterior());
+        assertFalse(it.hayAnterior());
+        assertTrue(it.haySiguiente());
+        assertEquals(42, it.siguiente());
+        assertTrue(it.hayAnterior());
+        assertTrue(it.haySiguiente());
+        assertEquals(43, it.siguiente());
+        assertTrue(it.hayAnterior());
+        assertTrue(it.haySiguiente());
+        assertEquals(44, it.siguiente());
+        assertFalse(it.haySiguiente());
+        assertTrue(it.hayAnterior());
+        assertEquals(44, it.anterior());
+        assertTrue(it.hayAnterior());
+        assertEquals(43, it.anterior());
     }
 
 }
